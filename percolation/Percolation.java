@@ -8,11 +8,12 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         count = N;
-        p = new QuickFind(N + 2);
-        open = new boolean[N];
+        p = new WQUFwithPathCompression(N*N + 2);
+        open = new boolean[N * N];
+        int total = N*N;
         for (int i = 0; i < N; i++) {
-            p.union(N, i);
-            p.union(N + 1, N - 1 - i);
+            p.union(total, i);
+            p.union(total + 1, total- 1 - i);
         }
 
     }
@@ -56,14 +57,14 @@ public class Percolation {
         check(i);
         boolean top = false, bottom = false;
         int idx = (i - 1) * count + j - 1;
-        top = p.connected(count, idx);
-        bottom = p.connected(count + 1, idx);
+        top = p.connected(count*count, idx);
+        bottom = p.connected(count*count + 1, idx);
 
         return top && bottom;
     }
 
     public boolean percolates() {
-        return p.connected(count, count + 1);
+        return p.connected(count * count, count * count + 1);
     }
 
     public static void main(String[] args) {

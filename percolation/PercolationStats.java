@@ -2,6 +2,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
+// java 17.0.1
+// compile command :
+// cd percolation; javac *.java;java -classpath . PercolationStats
 public class PercolationStats {
 
     private double[] result;
@@ -21,7 +24,7 @@ public class PercolationStats {
     }
 
     private void test(int num) {
-        Percolation p = new Percolation(result.length);
+        Percolation p = new Percolation(N);
         List<Integer> blockedX = new ArrayList<Integer>();
         List<Integer> blockedY = new ArrayList<Integer>();
         for (int i = 1; i <= N; i++) {
@@ -76,5 +79,10 @@ public class PercolationStats {
     }
 
     public static void main(String[] args) {
+        PercolationStats p = new PercolationStats(300, 30);
+        System.out.println(p.mean());
+        System.out.println(p.stddev());
+        System.out.println(p.confidenceLo());
+        System.out.println(p.confidenceHi());
     }
 }
