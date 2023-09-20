@@ -8,14 +8,44 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         count = N;
-        p = new WQUFwithPathCompression(N*N + 2);
+        p = new WQUFwithPathCompression(N * N + 2);
         open = new boolean[N * N];
-        int total = N*N;
+        int total = N * N;
         for (int i = 0; i < N; i++) {
             p.union(total, i);
             p.union(total + 1, total- 1 - i);
         }
 
+    }
+    
+    public Percolation(int N, AlgorithmType type) {
+        if (N <= 0) {
+            throw new IllegalArgumentException();
+        }
+        count = N;
+        int temp = N * N + 2;
+        switch (type) {
+            case QuickFind:
+                p = new QuickFind(temp);
+                break;
+            case QuickUnion:
+                p = new QuickUnion(temp);
+                break;
+            case WeightedQuickUnion:
+                p = new WeightedQuickUnion(temp);
+                break;
+            case WQUFwithPathCompression:
+                p = new WQUFwithPathCompression(temp);
+                break;
+            default:
+                throw new UnsupportedOperationException(null, null);
+        }
+        open = new boolean[N * N];
+        int total = N * N;
+        for (int i = 0; i < N; i++) {
+            p.union(total, i);
+            p.union(total + 1, total - 1 - i);
+        }
     }
 
     public void open(int i, int j) {
@@ -57,8 +87,8 @@ public class Percolation {
         check(i);
         boolean top = false, bottom = false;
         int idx = (i - 1) * count + j - 1;
-        top = p.connected(count*count, idx);
-        bottom = p.connected(count*count + 1, idx);
+        top = p.connected(count * count, idx);
+        bottom = p.connected(count * count + 1, idx);
 
         return top && bottom;
     }

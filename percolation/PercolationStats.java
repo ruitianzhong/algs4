@@ -10,7 +10,7 @@ public class PercolationStats {
     private double[] result;
     private int N;
     private Random random;
-
+      
     public PercolationStats(int N, int T) {
 
         result = new double[T];
@@ -18,13 +18,24 @@ public class PercolationStats {
         random = new Random(System.currentTimeMillis());
 
         for (int i = 0; i < T; i++) {
-            test(i);
+            test(i, AlgorithmType.QuickFind);
         }
 
     }
 
-    private void test(int num) {
-        Percolation p = new Percolation(N);
+    public PercolationStats(int N, int T, AlgorithmType type) {
+        result = new double[T];
+        this.N = N;
+        random = new Random(System.currentTimeMillis());
+
+        for (int i = 0; i < T; i++) {
+            test(i, type);
+        }
+
+    }
+
+    private void test(int num, AlgorithmType type) {
+        Percolation p = new Percolation(N, type);
         List<Integer> blockedX = new ArrayList<Integer>();
         List<Integer> blockedY = new ArrayList<Integer>();
         for (int i = 1; i <= N; i++) {
@@ -79,10 +90,22 @@ public class PercolationStats {
     }
 
     public static void main(String[] args) {
-        PercolationStats p = new PercolationStats(300, 30);
-        System.out.println(p.mean());
-        System.out.println(p.stddev());
-        System.out.println(p.confidenceLo());
-        System.out.println(p.confidenceHi());
+        testHelper(30, 100, AlgorithmType.QuickFind);
+        testHelper(30, 100, AlgorithmType.QuickUnion);
+        testHelper(30, 100, AlgorithmType.WeightedQuickUnion);
+        testHelper(30, 100, AlgorithmType.WQUFwithPathCompression);
+    }
+
+    private static void testHelper(int N,int T,AlgorithmType type){
+        long start = System.currentTimeMillis(), end;
+        System.out.println(type.name());
+        PercolationStats p = new PercolationStats(N, T, type);
+        end = System.currentTimeMillis();
+        System.out.println("mean: " + p.mean());
+        System.out.println("stddev: " + p.stddev());
+        System.out.println("confidenceLo: " + p.confidenceLo());
+        System.out.println("confidenceHi: " + p.confidenceHi());
+        System.out.println("time spent:" + (end - start) + " ms");
+        System.out.println();
     }
 }
