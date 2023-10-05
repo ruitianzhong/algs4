@@ -1,2 +1,7 @@
 */*.class
 */*.pdf
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.gz

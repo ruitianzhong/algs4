@@ -10,6 +10,7 @@ public class PercolationStats {
     private double[] result;
     private int N;
     private Random random;
+    private double avgTime = 0;
       
     public PercolationStats(int N, int T) {
 
@@ -57,7 +58,12 @@ public class PercolationStats {
         result[num] = ((double) count) / ((double) N * N);
 
     }
-
+    public double getAverageTime(){
+        return this.avgTime;
+    }
+    public void setAverageTime(double time){
+        this.avgTime = time;
+    }
     public double mean() {
         double sum = 0;
         for (int i = 0; i < result.length; i++) {
@@ -90,22 +96,38 @@ public class PercolationStats {
     }
 
     public static void main(String[] args) {
-        testHelper(30, 100, AlgorithmType.QuickFind);
-        testHelper(30, 100, AlgorithmType.QuickUnion);
+        testHelper(10, 100, AlgorithmType.WeightedQuickUnion);
         testHelper(30, 100, AlgorithmType.WeightedQuickUnion);
-        testHelper(30, 100, AlgorithmType.WQUFwithPathCompression);
+        testHelper(100, 100, AlgorithmType.WeightedQuickUnion);
+        testHelper(200, 100, AlgorithmType.WeightedQuickUnion);
+        int i = 5;
+        while (i <= 320) {
+            PercolationStats p = testHelper(i, 40, AlgorithmType.WeightedQuickUnion);
+            System.out.print(p.getAverageTime() + ",");
+            i *= 2;
+        }
+        i = 5;
+        System.out.println();
+        while (i <= 320) {
+            PercolationStats p = testHelper(i, 40, AlgorithmType.QuickFind);
+            System.out.print(p.getAverageTime() + ",");
+            i *= 2;
+        }
+
     }
 
-    private static void testHelper(int N,int T,AlgorithmType type){
+    private static PercolationStats testHelper(int N,int T,AlgorithmType type){
         long start = System.currentTimeMillis(), end;
-        System.out.println(type.name());
+        // System.out.println(type.name());
         PercolationStats p = new PercolationStats(N, T, type);
         end = System.currentTimeMillis();
-        System.out.println("mean: " + p.mean());
-        System.out.println("stddev: " + p.stddev());
-        System.out.println("confidenceLo: " + p.confidenceLo());
-        System.out.println("confidenceHi: " + p.confidenceHi());
-        System.out.println("time spent:" + (end - start) + " ms");
-        System.out.println();
+        // System.out.println("mean: " + p.mean());
+        // System.out.println("stddev: " + p.stddev());
+        // System.out.println("confidenceLo: " + p.confidenceLo());
+        // System.out.println("confidenceHi: " + p.confidenceHi());
+        // System.out.println("time spent on average:" + (float)(end-start)/(float)T + " ms");
+        p.setAverageTime((float)(end-start)/(float)T);
+        // System.out.println();
+        return p;
     }
 }
