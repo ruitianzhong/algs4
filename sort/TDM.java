@@ -1,5 +1,5 @@
 
-public class TDM {
+public class TDM implements Sort{
     int[] aux;
 
     public void sort(int arr[]) {

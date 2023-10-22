@@ -1,5 +1,5 @@
 
-public class BUM {
+public class BUM implements Sort{
     int[] aux;
 
     public void sort(int[] arr) {

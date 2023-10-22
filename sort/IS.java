@@ -1,5 +1,5 @@
 
-public class IS {
+public class IS implements Sort {
     public void sort(int[] arr) {
 
         for (int i = 0; i < arr.length - 1; i++) {
