@@ -4,6 +4,12 @@ import java.util.Random;
 public class test {
     public static void main(String[] args) {
         correctnessTest();
+        perfomanceTest(100000, TestType.Random);
+        perfomanceTest(1000000, TestType.Random);
+        perfomanceTest(10000000, TestType.Random);
+
+        perfomanceTest(10000000, TestType.Desc);
+        perfomanceTest(10000000, TestType.Desc);
 
     }
 
@@ -105,6 +111,7 @@ public class test {
 
     public static void perfomanceTest(int scale, TestType type) {
         long[][] temporal = new long[5][10];
+        long[][] memory = new long[5][10];
         for (int i = 0; i < 10; i++) {
             Sort[] s = new Sort[5];
             int[] arr;
@@ -135,12 +142,15 @@ public class test {
                 s[j].sort(ephemeral);
                 end = System.currentTimeMillis();
                 temporal[j][i] = end - start;
+                memory[j][i] = s[j].memory();
             }
+            printResult("Time scale " + scale + " " + type.name(), temporal);
+            printResult("Memory scale " + scale + " " + type.name(), memory);
 
         }
     }
 
-    public void printTimeResult(String tag, long[][] result) {
+    public static void printResult(String tag, long[][] result) {
         System.out.println("TAG: " + tag);
         String[] s = { "IS", "TDM", "BUM", "RQ", "QD3P" };
         for (int i = 0; i < s.length; i++) {
@@ -149,6 +159,7 @@ public class test {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
 }
