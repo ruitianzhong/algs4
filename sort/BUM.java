@@ -1,11 +1,15 @@
 
-public class BUM implements Sort{
+public class BUM implements Sort {
     int[] aux;
+    volatile MemoryMonitor m;
 
     public void sort(int[] arr) {
+        m = new MemoryMonitor();
         aux = new int[arr.length];
+        m.update();
         for (int sz = 1; sz < arr.length; sz = sz + sz) {
             for (int k = 0; k + sz < arr.length; k += sz + sz) {
+                m.update();
                 merge(arr, k, k + sz - 1, min(k + sz + sz - 1, arr.length - 1));
             }
 
@@ -19,6 +23,7 @@ public class BUM implements Sort{
     private void merge(int arr[], int lo, int mid, int hi) {
 
         int i = lo, j = mid + 1, n = 0;
+        m.update();
         while (i <= mid && j <= hi) {
             if (arr[i] <= arr[j]) {
                 aux[n++] = arr[i];
@@ -28,6 +33,7 @@ public class BUM implements Sort{
                 j++;
             }
         }
+        m.update();
         while (i <= mid) {
             aux[n++] = arr[i];
             i++;
@@ -40,5 +46,9 @@ public class BUM implements Sort{
             arr[lo + i] = aux[i];
         }
 
+    }
+
+    public long memory() {
+        return m.getMaxMemory();
     }
 }

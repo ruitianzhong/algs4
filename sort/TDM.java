@@ -1,15 +1,19 @@
 
-public class TDM implements Sort{
+public class TDM implements Sort {
     int[] aux;
+    volatile MemoryMonitor m;
 
     public void sort(int arr[]) {
+        m = new MemoryMonitor();
         aux = new int[arr.length];
+        m.update();
         mergeSort(arr, 0, arr.length - 1);
     }
 
     private void mergeSort(int arr[], int lo, int hi) {
         if (lo < hi) {
             int mid = lo + (hi - lo) / 2;
+            m.update();
             mergeSort(arr, lo, mid);
             mergeSort(arr, mid + 1, hi);
             merge(arr, lo, mid, hi);
@@ -40,5 +44,9 @@ public class TDM implements Sort{
             arr[lo + i] = aux[i];
         }
 
+    }
+
+    public long memory() {
+        return m.getMaxMemory();
     }
 }

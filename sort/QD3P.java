@@ -1,6 +1,9 @@
 
 public class QD3P implements Sort {
+    volatile MemoryMonitor m;
+
     public void sort(int[] arr) {
+        m = new MemoryMonitor();
         quickSort3Way(arr, 0, arr.length - 1);
     }
 
@@ -8,6 +11,7 @@ public class QD3P implements Sort {
         if (lo < hi) {
             int lt = lo, i = lo + 1, gt = hi;
             int v = arr[lo];
+            m.update();
             while (i <= gt) {
                 if (arr[i] < v) {
                     int temp = arr[lt];
@@ -29,5 +33,9 @@ public class QD3P implements Sort {
             quickSort3Way(arr, gt + 1, hi);
         }
 
+    }
+
+    public long memory() {
+        return m.getMaxMemory();
     }
 }

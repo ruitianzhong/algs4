@@ -2,9 +2,11 @@ import java.util.Random;
 
 public class RQ implements Sort {
     Random r;
+    volatile MemoryMonitor m;
 
     public void sort(int[] arr) {
         r = new Random(System.currentTimeMillis());
+        m = new MemoryMonitor();
         quickSort(arr, 0, arr.length - 1);
     }
 
@@ -16,6 +18,7 @@ public class RQ implements Sort {
             arr[lo + rn] = temp;
             int pivot = arr[lo];
             int i = lo, j = hi;
+            m.update();
             while (i < j) {
                 while (arr[j] > pivot && i < j) {
                     j--;
@@ -35,9 +38,12 @@ public class RQ implements Sort {
             arr[i] = pivot;
             quickSort(arr, lo, i - 1);
             quickSort(arr, i + 1, hi);
-
+            m.update();
         }
 
     }
 
+    public long memory() {
+        return m.getMaxMemory();
+    }
 }
