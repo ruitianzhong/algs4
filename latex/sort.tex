@@ -1,0 +1,364 @@
+\documentclass[12pt,a4paper]{ctexart}
+\usepackage{amsmath,geometry,listings}
+\usepackage{xcolor}
+\usepackage[linesnumbered,boxed,ruled,commentsnumbered]{algorithm2e}
+\usepackage{graphicx}
+
+\usepackage{float}
+\lstset{
+    numbers=left,
+    keywordstyle = \color{blue},
+    frame=shadowbox,
+    commentstyle=\color{gray},
+    identifierstyle=\color{red},
+    language=c,
+}
+\pagestyle{plain}% 去除页眉
+\geometry{left=2.54cm,right=2.54cm,top=2.5cm,bottom=2.5cm}
+\fontsize{12pt}{\baselineskip}
+\title{排序算法性能比较实验报告}
+\author{Ruitian Zhong}
+\date{2023-10-24}
+\begin{document}
+\maketitle
+\section{实验内容}
+\paragraph{}实现插入排序（Insertion Sort，IS），自顶向下归并排序（Top-down Mergesort，TDM），自底向上归并排
+序（Bottom-up Mergesort，BUM），随机快速排序（Random Quicksort，RQ），Dijkstra 3-路划分快速排序
+（Quicksort with Dijkstra 3-way Partition，QD3P）。在你的计算机上针对不同输入规模数据进行实验，对
+比上述排序算法的时间及空间占用性能。要求对于每次输入运行 10 次，记录每次时间/空间占用，取平
+均值。
+
+\section{实验方法}
+\subsection{时间计算}
+\paragraph{}在使用每种排序算法排序前记录下开始时间$start$（以纳秒为单位），调用结束后
+记录下结束时间$end$，单次排序消耗的时间为
+$$ T = end - start $$
+
+\begin{lstlisting}[basicstyle=\ttfamily,caption=sort/test.java,language=java,showstringspaces=false,firstnumber=140]
+    for (int j = 0; j < 5; j++) {
+        int[] ephemeral = arr.clone();
+        start = System.nanoTime();
+        s[j].sort(ephemeral);
+        end = System.nanoTime();
+        temporal[j][i] = end - start;
+        memory[j][i] = s[j].memory();
+    }
+\end{lstlisting}
+
+
+
+\subsection{空间占用计算}
+\paragraph{}为了计算最大空间占用，实现了\textit{MemoryMonitor}类,该
+类主要提供了两个函数调用，一个是\textit{void update(int x)}，其中x为使用内存的变化量，
+当使用内存时$x>0$，释放内存时$x<0$，这样能够大致统计递归函数调用时的最大内存用量;
+\textit{void getMaxMemory()}获取排序时消耗的最大内存。
+\lstinputlisting[language=java,basicstyle=\ttfamily,caption=sort/MemoryMonitor.java]{../sort/MemoryMonitor.java}
+
+\subsection{实验流程}
+\begin{enumerate}
+    \item 规模为10000，随机生成的数组排序
+    \item 规模为50000，随机生成的数组排序
+    \item 规模为100000，随机生成的数组排序
+    \item 规模为10000，生成降序数组排序（将降序数组排序成升序数组）
+    \item 规模为10000，所有元素相同的数组排序
+\end{enumerate}
+
+
+\section{实验结果}
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，随机生成的数组排序,时间/ns}
+
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS       & TDM     & BUM     & RQ      & QD3P    \\ \hline
+        1       & 18747700 & 2514500 & 2727400 & 2230300 & 2505000 \\ \hline
+        2       & 35722300 & 723400  & 1058000 & 478200  & 418300  \\ \hline
+        3       & 13312000 & 961800  & 1166900 & 468200  & 770400  \\ \hline
+        4       & 13149500 & 821800  & 1069000 & 492700  & 320600  \\ \hline
+        5       & 12987700 & 801200  & 1131300 & 509000  & 295500  \\ \hline
+        6       & 12937700 & 877600  & 1097000 & 449100  & 308600  \\ \hline
+        7       & 12940100 & 828200  & 1121600 & 458100  & 306000  \\ \hline
+        8       & 13276600 & 822400  & 714800  & 508900  & 305600  \\ \hline
+        9       & 13139400 & 841500  & 703400  & 467900  & 303300  \\ \hline
+        10      & 12783700 & 923700  & 772600  & 497000  & 300100  \\ \hline
+        Average & 15899670 & 1011610 & 1156200 & 655940  & 583340  \\ \hline
+    \end{tabular}
+
+\end{table}
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，随机生成的数组排序,内存/kB}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS    & TDM    & BUM    & RQ     & QD3P   \\ \hline
+        1       & 0.012 & 39.129 & 39.082 & 0.43   & 0.203  \\ \hline
+        2       & 0.012 & 39.129 & 39.082 & 0.488  & 0.188  \\ \hline
+        3       & 0.012 & 39.129 & 39.082 & 0.43   & 0.234  \\ \hline
+        4       & 0.012 & 39.129 & 39.082 & 0.41   & 0.188  \\ \hline
+        5       & 0.012 & 39.129 & 39.082 & 0.41   & 0.219  \\ \hline
+        6       & 0.012 & 39.129 & 39.082 & 0.527  & 0.219  \\ \hline
+        7       & 0.012 & 39.129 & 39.082 & 0.43   & 0.188  \\ \hline
+        8       & 0.012 & 39.129 & 39.082 & 0.449  & 0.172  \\ \hline
+        9       & 0.012 & 39.129 & 39.082 & 0.449  & 0.25   \\ \hline
+        10      & 0.012 & 39.129 & 39.082 & 0.43   & 0.188  \\ \hline
+        Average & 0.012 & 39.129 & 39.082 & 0.4453 & 0.2049 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为50000，随机生成的数组排序,时间/ns}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS        & TDM     & BUM     & RQ      & QD3P    \\ \hline
+        1       & 347772700 & 4226400 & 3537800 & 2342500 & 1809000 \\ \hline
+        2       & 330399600 & 3359800 & 3137600 & 2419800 & 1611900 \\ \hline
+        3       & 321177400 & 4301400 & 3385700 & 2266000 & 1478000 \\ \hline
+        4       & 385847900 & 4790600 & 3535000 & 2785100 & 1741600 \\ \hline
+        5       & 352844700 & 4694800 & 3709400 & 2450100 & 1533900 \\ \hline
+        6       & 337261100 & 3993200 & 2958500 & 2184300 & 1462500 \\ \hline
+        7       & 350169200 & 5381900 & 3861900 & 2576900 & 1661800 \\ \hline
+        8       & 351262500 & 4218400 & 3433700 & 2312400 & 1490800 \\ \hline
+        9       & 324163000 & 4294900 & 3336500 & 2288600 & 1490100 \\ \hline
+        10      & 339655600 & 4633800 & 3466800 & 2370100 & 1531800 \\ \hline
+        Average & 344055370 & 4389520 & 3436290 & 2399580 & 1581140 \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为50000，随机生成的数组排序,内存/kB}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS    & TDM     & BUM     & RQ     & QD3P   \\ \hline
+        1       & 0.012 & 195.387 & 195.332 & 0.566  & 0.234  \\ \hline
+        2       & 0.012 & 195.387 & 195.332 & 0.508  & 0.172  \\ \hline
+        3       & 0.012 & 195.387 & 195.332 & 0.508  & 0.203  \\ \hline
+        4       & 0.012 & 195.387 & 195.332 & 0.449  & 0.203  \\ \hline
+        5       & 0.012 & 195.387 & 195.332 & 0.508  & 0.203  \\ \hline
+        6       & 0.012 & 195.387 & 195.332 & 0.547  & 0.188  \\ \hline
+        7       & 0.012 & 195.387 & 195.332 & 0.469  & 0.188  \\ \hline
+        8       & 0.012 & 195.387 & 195.332 & 0.488  & 0.203  \\ \hline
+        9       & 0.012 & 195.387 & 195.332 & 0.527  & 0.234  \\ \hline
+        10      & 0.012 & 195.387 & 195.332 & 0.488  & 0.203  \\ \hline
+        Average & 0.012 & 195.387 & 195.332 & 0.5058 & 0.2031 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+
+
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为100000，随机生成的数组排序,时间/ns}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS         & TDM      & BUM     & RQ      & QD3P    \\ \hline
+        1       & 1412390600 & 8269800  & 7583300 & 4970800 & 3995400 \\ \hline
+        2       & 1373270300 & 8632700  & 6964500 & 4724600 & 3182100 \\ \hline
+        3       & 1453717400 & 10812500 & 7290300 & 4809700 & 3312200 \\ \hline
+        4       & 1325760700 & 8636500  & 6687500 & 4569100 & 3113900 \\ \hline
+        5       & 1267842600 & 8448200  & 6868900 & 4603000 & 2979400 \\ \hline
+        6       & 1284115500 & 8491100  & 6805500 & 4636700 & 2883400 \\ \hline
+        7       & 1302477200 & 8607900  & 6809700 & 4703100 & 2845600 \\ \hline
+        8       & 1289560200 & 8569400  & 7073300 & 4636800 & 2993500 \\ \hline
+        9       & 1275855800 & 8582500  & 6814100 & 4773400 & 2962900 \\ \hline
+        10      & 1334560100 & 9216300  & 6856100 & 4726500 & 2833800 \\ \hline
+        Average & 1331955040 & 8826690  & 6975320 & 4715370 & 3110220 \\ \hline
+    \end{tabular}
+
+\end{table}
+
+
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为100000，随机生成的数组排序,内存/kB}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS    & TDM     & BUM     & RQ     & QD3P  \\ \hline
+        1       & 0.012 & 390.703 & 390.645 & 0.508  & 0.188 \\ \hline
+        2       & 0.012 & 390.703 & 390.645 & 0.508  & 0.234 \\ \hline
+        3       & 0.012 & 390.703 & 390.645 & 0.488  & 0.188 \\ \hline
+        4       & 0.012 & 390.703 & 390.645 & 0.508  & 0.203 \\ \hline
+        5       & 0.012 & 390.703 & 390.645 & 0.508  & 0.203 \\ \hline
+        6       & 0.012 & 390.703 & 390.645 & 0.586  & 0.188 \\ \hline
+        7       & 0.012 & 390.703 & 390.645 & 0.547  & 0.172 \\ \hline
+        8       & 0.012 & 390.703 & 390.645 & 0.586  & 0.172 \\ \hline
+        9       & 0.012 & 390.703 & 390.645 & 0.547  & 0.203 \\ \hline
+        10      & 0.012 & 390.703 & 390.645 & 0.547  & 0.219 \\ \hline
+        Average & 0.012 & 390.703 & 390.645 & 0.5333 & 0.197 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，生成降序数组排序,时间/ns}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS       & TDM     & BUM    & RQ     & QD3P      \\ \hline
+        1       & 27334300 & 413300  & 282500 & 446800 & 109686500 \\ \hline
+        2       & 25383300 & 423400  & 292600 & 337000 & 108032800 \\ \hline
+        3       & 25422700 & 447400  & 298700 & 329000 & 124322300 \\ \hline
+        4       & 28759500 & 460000  & 316600 & 373900 & 116187200 \\ \hline
+        5       & 25298100 & 425800  & 313300 & 358200 & 108637400 \\ \hline
+        6       & 25334800 & 464400  & 339800 & 336100 & 108694000 \\ \hline
+        7       & 25334400 & 2208700 & 196400 & 306800 & 105843000 \\ \hline
+        8       & 26227000 & 235600  & 196600 & 290400 & 106899000 \\ \hline
+        9       & 25460900 & 412500  & 283100 & 345100 & 110229200 \\ \hline
+        10      & 25998200 & 238700  & 215200 & 301500 & 107254600 \\ \hline
+        Average & 26055320 & 572980  & 273480 & 342480 & 110578600 \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，生成降序数组排序,内存/kB}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS    & TDM    & BUM    & RQ     & QD3P    \\ \hline
+        1       & 0.012 & 39.129 & 39.082 & 0.566  & 156.234 \\ \hline
+        2       & 0.012 & 39.129 & 39.082 & 0.605  & 156.234 \\ \hline
+        3       & 0.012 & 39.129 & 39.082 & 0.605  & 156.234 \\ \hline
+        4       & 0.012 & 39.129 & 39.082 & 0.527  & 156.234 \\ \hline
+        5       & 0.012 & 39.129 & 39.082 & 0.625  & 156.234 \\ \hline
+        6       & 0.012 & 39.129 & 39.082 & 0.547  & 156.234 \\ \hline
+        7       & 0.012 & 39.129 & 39.082 & 0.586  & 156.234 \\ \hline
+        8       & 0.012 & 39.129 & 39.082 & 0.605  & 156.234 \\ \hline
+        9       & 0.012 & 39.129 & 39.082 & 0.703  & 156.234 \\ \hline
+        10      & 0.012 & 39.129 & 39.082 & 0.645  & 156.234 \\ \hline
+        Average & 0.012 & 39.129 & 39.082 & 0.6014 & 156.234 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，所有元素相同的数组排序,时间/ns}
+
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS     & TDM     & BUM     & RQ      & QD3P   \\ \hline
+        1       & 847000 & 1363500 & 1511500 & 1391600 & 173500 \\ \hline
+        2       & 199700 & 897400  & 1207900 & 457200  & 162800 \\ \hline
+        3       & 178900 & 778900  & 1190800 & 505500  & 184200 \\ \hline
+        4       & 225700 & 5105500 & 717100  & 435000  & 168000 \\ \hline
+        5       & 197400 & 3198100 & 734000  & 403700  & 181600 \\ \hline
+        6       & 217800 & 398500  & 692500  & 398700  & 167500 \\ \hline
+        7       & 204900 & 393600  & 560000  & 401300  & 199500 \\ \hline
+        8       & 55100  & 381900  & 264600  & 397000  & 56200  \\ \hline
+        9       & 34500  & 398100  & 260000  & 418400  & 35300  \\ \hline
+        10      & 29500  & 388700  & 258800  & 408700  & 24900  \\ \hline
+        Average & 219050 & 1330420 & 739720  & 521710  & 135350 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+    \setlength{\abovecaptionskip}{0cm}
+    \setlength{\belowcaptionskip}{0.5cm}
+    \small
+    \centering
+    \caption[short]{规模为10000，所有元素相同的数组排序,内存/kB}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+                & IS    & TDM    & BUM    & RQ    & QD3P  \\ \hline
+        1       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        2       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        3       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        4       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        5       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        6       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        7       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        8       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        9       & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        10      & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+        Average & 0.012 & 39.129 & 39.082 & 0.254 & 0.016 \\ \hline
+    \end{tabular}
+\end{table}
+
+
+
+\section{实验结果分析与回答问题}
+\begin{enumerate}
+    \item Which sort worked best on data in constant or increasing order (i.e., already sorted data)? Why do you think
+          this sort worked best?
+          \paragraph{回答}
+          插入排序在数组为常数或升序的时候性能最好，因为在有序的情况下插入排序的内层循环只执行一次，时间复杂度在这种情况下降为$\mathcal{O}(n)$，
+          空间复杂度为$mathcal{O}(1)$
+    \item Did the same sort do well on the case of mostly sorted data? Why or why not?
+          \paragraph{回答}
+          不是同一个排序算法在所有情况下都做得很好。比如说插入排序在数组有序下性能好，但数组随机生成的时候
+          数组下降得很快，又比如，归并排序在数据量较小得情况下，效率不如插入排序高。
+
+    \item In general, did the ordering of the incoming data affect the performance of the sorting algorithms? Please
+          answer this question by referencing specific data from your table to support your answer.
+
+          \paragraph{回答} 会有影响。比如说有10000个数据，这10000个数据在$[0,100)$范围内的时候，三路切分比快速排序的速度要快（$3110220<4715370$）
+
+
+    \item  Which sort did best on the shorter (i.e., n = 1,000) data sets? Did the same one do better on the longer (i.e.,
+          n = 100,000) data sets? Why or why not? Please use specific data from your table to support your answer.
+
+          \paragraph{回答}
+          数据量比较小($n=100$)的时候插入排序表现较好,随着数据的增大，QD3P的表现变好，主要是数据量变多，重复的数据增加，
+          三路切分处理重复的情况效率比较高，因此速度最快。
+          
+    \item In general, which sort did better? Give a hypothesis as to why the difference in performance exists.
+
+          \paragraph{回答}
+          \textit{QD3P}做得比较好，它的时间复杂度为$\mathcal{O}(\lg{n})$，而且能够处理好重复数据较多的情况（实验证明了它在这种情况下是最快的）
+
+    \item Are there results in your table that seem to be inconsistent? (e.g., If I get run times for a sort that look like
+          this [1.3, 1.5, 1.6, 7.0, 1.2, 1.6, 1.4, 1.8, 2.0, 1.5] the 7.0 entry is not consistent with the rest). Why do you think
+          this happened
+
+          \paragraph{回答} 确实有一些异常数据出现，我认为是由于生成的随机数据导致了某种比较差的初始情况，此外，
+          \textit{Java Virtual Machine(JVM)}会定时进行垃圾收集，导致一定程度上的延迟。
+
+\end{enumerate}
+
+
+\end{document}
+
+
+

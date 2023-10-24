@@ -10,6 +10,7 @@ public class test {
 
         perfomanceTest(10000, TestType.Desc);
         perfomanceTest(10000, TestType.Duplicate);
+        perfomanceTest(100000, TestType.Asc);
 
     }
 
@@ -17,7 +18,7 @@ public class test {
         int[] arr = new int[n];
         Random r = new Random(System.currentTimeMillis());
         for (int i = 0; i < n; i++) {
-            arr[i] = r.nextInt(100);
+            arr[i] = r.nextInt(100000);
         }
         return arr;
     }
@@ -106,7 +107,7 @@ public class test {
     }
 
     enum TestType {
-        Random, Duplicate, Desc
+        Random, Duplicate, Desc, Asc
     }
 
     public static void perfomanceTest(int scale, TestType type) {
@@ -125,6 +126,9 @@ public class test {
                     break;
                 case Random:
                     arr = generateRandom(scale);
+                    break;
+                case Asc:
+                    arr = generateAsc(scale);
                     break;
                 default:
                     throw new UnsupportedOperationException(type.name());
@@ -170,6 +174,15 @@ public class test {
             System.out.println();
         }
         System.out.println();
+    }
+
+    private static int[] generateAsc(int n) {
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = i;
+        }
+        return arr;
+
     }
 
 }
