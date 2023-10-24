@@ -18,7 +18,7 @@ public class RQ implements Sort {
             arr[lo + rn] = temp;
             int pivot = arr[lo];
             int i = lo, j = hi;
-            m.update();
+            m.update(20);
             while (i < j) {
                 while (arr[j] > pivot && i < j) {
                     j--;
@@ -38,7 +38,7 @@ public class RQ implements Sort {
             arr[i] = pivot;
             quickSort(arr, lo, i - 1);
             quickSort(arr, i + 1, hi);
-            m.update();
+            m.update(-20);
         }
 
     }

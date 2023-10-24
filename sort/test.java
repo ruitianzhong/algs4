@@ -4,12 +4,12 @@ import java.util.Random;
 public class test {
     public static void main(String[] args) {
         correctnessTest();
+        perfomanceTest(10000, TestType.Random);
+        perfomanceTest(50000, TestType.Random);
         perfomanceTest(100000, TestType.Random);
-        perfomanceTest(1000000, TestType.Random);
-        perfomanceTest(10000000, TestType.Random);
 
-        perfomanceTest(10000000, TestType.Desc);
-        perfomanceTest(10000000, TestType.Desc);
+        perfomanceTest(10000, TestType.Desc);
+        perfomanceTest(10000, TestType.Duplicate);
 
     }
 
@@ -125,6 +125,7 @@ public class test {
                     break;
                 case Random:
                     arr = generateRandom(scale);
+                    break;
                 default:
                     throw new UnsupportedOperationException(type.name());
 
@@ -138,22 +139,31 @@ public class test {
             long start, end;
             for (int j = 0; j < 5; j++) {
                 int[] ephemeral = arr.clone();
-                start = System.currentTimeMillis();
+                start = System.nanoTime();
                 s[j].sort(ephemeral);
-                end = System.currentTimeMillis();
+                end = System.nanoTime();
                 temporal[j][i] = end - start;
                 memory[j][i] = s[j].memory();
             }
-            printResult("Time scale " + scale + " " + type.name(), temporal);
-            printResult("Memory scale " + scale + " " + type.name(), memory);
-
         }
+        printResult("Time scale " + scale + " " + type.name(), temporal);
+        System.out.println("Memory scale " + scale + " " + type.name());
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 10; j++) {
+
+                double t = (double) (memory[i][j]) / (double) 1024;
+                System.out.printf("%.3f,", t);
+            }
+            System.out.println();
+        }
+
     }
 
     public static void printResult(String tag, long[][] result) {
         System.out.println("TAG: " + tag);
         String[] s = { "IS", "TDM", "BUM", "RQ", "QD3P" };
         for (int i = 0; i < s.length; i++) {
+            System.out.printf("%s,", s[i]);
             for (int j = 0; j < 10; j++) {
                 System.out.printf("%d,", result[i][j]);
             }

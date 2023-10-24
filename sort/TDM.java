@@ -6,23 +6,26 @@ public class TDM implements Sort {
     public void sort(int arr[]) {
         m = new MemoryMonitor();
         aux = new int[arr.length];
-        m.update();
+        m.update(4 * arr.length);
         mergeSort(arr, 0, arr.length - 1);
+        m.update(-4 * arr.length);
     }
 
     private void mergeSort(int arr[], int lo, int hi) {
         if (lo < hi) {
             int mid = lo + (hi - lo) / 2;
-            m.update();
+            m.update(4);
             mergeSort(arr, lo, mid);
             mergeSort(arr, mid + 1, hi);
             merge(arr, lo, mid, hi);
+            m.update(-4);
         }
     }
 
     private void merge(int arr[], int lo, int mid, int hi) {
 
         int i = lo, j = mid + 1, n = 0;
+        m.update(4 * 3);
         while (i <= mid && j <= hi) {
             if (arr[i] <= arr[j]) {
                 aux[n++] = arr[i];
@@ -43,6 +46,7 @@ public class TDM implements Sort {
         for (i = 0; i < n; i++) {
             arr[lo + i] = aux[i];
         }
+        m.update(-4 * 3);
 
     }
 

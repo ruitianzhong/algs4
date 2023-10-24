@@ -11,7 +11,7 @@ public class QD3P implements Sort {
         if (lo < hi) {
             int lt = lo, i = lo + 1, gt = hi;
             int v = arr[lo];
-            m.update();
+            m.update(4 * 4);
             while (i <= gt) {
                 if (arr[i] < v) {
                     int temp = arr[lt];
@@ -31,6 +31,7 @@ public class QD3P implements Sort {
             }
             quickSort3Way(arr, lo, lt - 1);
             quickSort3Way(arr, gt + 1, hi);
+            m.update(-4 * 4);
         }
 
     }
