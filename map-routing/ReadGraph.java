@@ -7,11 +7,8 @@ public class ReadGraph {
     public static Graph readGraph(String filename) throws FileNotFoundException {
         try (Scanner sc = new Scanner(new FileReader(filename))) {
             String line = sc.nextLine();
-            System.out.println(line);
 
             String[] number = line.split("  *");
-            System.out.println(number.length);
-            System.out.println(number[0] + number[1]);
             int v = Integer.parseInt(number[0]), e = Integer.parseInt(number[1]);
             System.out.printf("vertex:%d,edge:%d\n", v, e);
             Graph g = new Graph(v);
@@ -39,19 +36,13 @@ public class ReadGraph {
             sc.close();
 
             System.out.println("Succeed to create the graph");
+            return g;
         }
-
-        return null;
-    }
-
-    public Iterable<Edge> pathTo(){
-        
     }
 
     public static void main(String[] args) throws FileNotFoundException {
         readGraph("input.txt");
 
     }
-
 
 }
