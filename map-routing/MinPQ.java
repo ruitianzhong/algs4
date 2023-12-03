@@ -23,7 +23,7 @@ public class MinPQ {
     public boolean contains(int i) {
         check(i);
 
-        return qp[i] == -1;
+        return qp[i] != -1;
 
     }
 
@@ -44,7 +44,7 @@ public class MinPQ {
         swim(n);
     }
 
-    public void changeWeight(int index, int weight) {
+    public void changeWeight(int index, double weight) {
         if (!contains(index)) {
             throw new IllegalArgumentException();
         }
@@ -54,6 +54,9 @@ public class MinPQ {
         sink(pos);
 
     }
+    public boolean isEmpty(){
+        return n == 0;
+    }
 
     public void sink(int k) {
         while (k * 2 <= n) {
@@ -61,7 +64,7 @@ public class MinPQ {
             if (k * 2 + 1 <= n && weight[pq[k * 2 + 1]] < weight[pq[i]]) {
                 i++;
             }
-            if (weight[pq[k]] < weight[pq[i]]) {
+            if (weight[pq[k]] > weight[pq[i]]) {
                 exchange(i, k);
             }
             k = i;
@@ -103,4 +106,32 @@ public class MinPQ {
         return weight[pq[1]];
     }
 
+    // javac MinPQ.java;java -cp . -ea MinPQ
+    public static void main(String[] args) {
+        for (int n = 1; n < 300; n++) {
+            double[] a = new double[n];
+            MinPQ pq = new MinPQ(n);
+            for (int j = 0; j < n; j++) {
+                a[j] = j;
+                pq.insert(j, n - j - 1);
+            }
+            for (int j = 0; j < n; j++) {
+                double min = pq.getMin();
+                assert (double) j == min;
+                int pos = pq.delMin();
+                assert pos == n - j - 1;
+            }
+            for (int j = 0; j < n; j++) {
+                pq.insert(j, j);
+            }
+            for (int j = 0; j < n; j++) {
+                double min = pq.getMin();
+                assert (double) j == min;
+                int pos = pq.delMin();
+                assert pos == j;
+            }
+        }
+        System.out.println("passed MinPQ unit test");
+
+    }
 }

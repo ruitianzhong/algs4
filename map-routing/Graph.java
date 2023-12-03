@@ -3,6 +3,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import javax.management.RuntimeErrorException;
+
 public class Graph {
 
     private ArrayList<LinkedList<Edge>> matrix;
@@ -19,12 +21,39 @@ public class Graph {
         this.n = n;
     }
 
+    public int vertex() {
+        return n;
+    }
+
+    private boolean duplicateCheck(int from, int to) {
+        Iterator<Edge> li = matrix.get(from).listIterator();
+        Edge e;
+        while (li.hasNext()) {
+            e = li.next();
+            if (e.from() != from) {
+                System.out.println(from);
+                System.out.println(e.from());
+                System.out.println(to);
+                throw new RuntimeErrorException(null);
+            }
+            if (e.to() == to) {
+                // System.out.println("duplicate");
+                // System.out.println("from " + from + " to " + to);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void AddEdge(Edge e) {
         int from = e.from(), to = e.to();
         if (from == to) {
             throw new IllegalArgumentException();
-
         }
+        if (duplicateCheck(from, to) || duplicateCheck(to, from)) {
+            return;
+        }
+
         double weight = e.weight();
         matrix.get(from).add(e);
         Edge ne = new Edge(to, from, weight);
