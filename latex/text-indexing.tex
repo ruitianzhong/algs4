@@ -1,0 +1,217 @@
+\documentclass[12pt,a4paper]{ctexart}
+\usepackage{amsmath,geometry,listings}
+\usepackage{xcolor}
+\usepackage[linesnumbered,boxed,ruled,commentsnumbered]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{float}
+\lstset{
+    numbers=left,
+    keywordstyle = \color{blue},
+    frame=shadowbox,
+    commentstyle=\color{gray},
+    identifierstyle=\color{red},
+    language=c,
+}
+\pagestyle{plain}% 去除页眉
+\geometry{left=2.54cm,right=2.54cm,top=2.5cm,bottom=2.5cm}
+\fontsize{12pt}{\baselineskip}
+\title{文本索引实验报告}
+\author{Ruitian Zhong}
+\date{2023-12-16}
+\begin{document}
+\maketitle
+\section{实验内容}
+\paragraph{背景介绍}
+
+程序应该读取语料库，将其存储为（可能巨大）字符串，并可能为其创建索引，如下所述。 然后
+它应该逐个读取查询（假设在命令行中的第二个命名文件中，每行有一个查询），并打印出语料库中每个查
+询在文本文件中首次出现的位置。
+
+\section{实验算法和实现}
+
+\subsection{三种可能的实现方式}
+第一种解决办法就是暴力搜索（Brute Force）,使用该方法搜索
+一次的时间复杂度为：
+
+\begin{equation}
+    \nonumber
+    \mathcal{O}{(n * m)}
+\end{equation}
+
+其中$m$是模式字符串的长度，$n$是主串的长度
+
+\begin{lstlisting}[basicstyle=\ttfamily,caption=text-indexing/BruteForceSearch.java,language=java,showstringspaces=false,firstnumber=105]
+
+@Override
+public int search(String pattern) {
+int i = 0, j = 0;
+while (j < content.length()) {
+for (i = 0; 
+     i < pattern.length() && i + j < content.length(); 
+     i++) {
+if (pattern.charAt(i) != content.charAt(j + i)) {
+    break;
+}
+}
+     if (i == pattern.length()) {
+                return j;
+        }
+            j++;
+        }
+        return -1;
+    }
+
+\end{lstlisting}
+
+第二种解决方法使用KMP匹配算法，其时间复杂度为
+\begin{equation}
+    \nonumber
+    \mathcal{O}{(n + m)}
+\end{equation}
+其中$n$为原字符串的长度，$m$为模式字符串的长度。
+
+\begin{lstlisting}[basicstyle=\ttfamily,caption=text-indexing/KMPSearch.java.java,language=java,showstringspaces=false]
+private int[] computeNext(String pattern) {
+    int[] next = new int[pattern.length()];
+    int j = 0, k = -1;
+    next[0] = -1;
+    while (j < pattern.length() - 1) {
+   if (k == -1 || pattern.charAt(k) == pattern.charAt(j)) {
+            j++;
+            k++;
+            next[j] = k;
+        } else {
+            k = next[k];
+        }
+    }
+    return next;
+}
+
+@Override
+public int search(String pattern) {
+    int i = 0, j = 0;
+    int index = -1;
+    int[] next = computeNext(pattern);
+    while (i < pattern.length() && j < content.length()) {
+    if (i == -1 || pattern.charAt(i) == content.charAt(j)) {
+            i++;
+            j++;
+        } else {
+            i = next[i];
+        }
+    }
+    if (i == pattern.length()) {
+        index = j - pattern.length();
+    }
+    return index;
+}
+\end{lstlisting}
+
+
+第三种解决办法是建立索引，加速查找的速度（建立索引需要时间）。
+我选择了使用后缀数组的方法，简单来说，构建一个指向字符串每个单词开始
+位置的指针/索引数组，然后根据字典序对该数组进行排序，搜索的时候使用
+二分查找的办法，可以将搜索相应字符串时算法的时间复杂度降低到对数级别（在模式串比较短
+的情况下），在这种方法下使用单词为分割边界，原因是减少建立索引时的时间、空间开销。
+
+因此，设计了TextSearch接口：
+\begin{lstlisting}[basicstyle=\ttfamily,caption=text-indexing/TextSearch.java.java,language=java,showstringspaces=false]
+
+public interface TextSearch {
+    int search(String pattern);
+}
+\end{lstlisting}
+
+BruteForceSearch、KMPSearch
+和IndexedSearch
+三个类分别实现\textit{TextSearch}这个接口。
+
+\subsection{测试文件生成}
+
+为了充分比较以上三种文本搜索方法的效率，不可能人工手动搜索，
+因此采用程序生成测试文件
+\begin{lstlisting}[basicstyle=\ttfamily,language=java,showstringspaces=false]
+
+public static void generateQuery() throws IOException {
+    File file = new File("query.txt");
+    if (!file.exists()) {
+        file.createNewFile();
+    }
+     FileWriter fileWriter = 
+                   new FileWriter(file.getName(), false);
+    var lines = getAllLine();
+    Random r = new Random(System.currentTimeMillis());
+    for (int i = 0; i < 6000; i++) {
+  int lineNum = r.nextInt(lines.size());
+  String line = lines.get(lineNum);
+  String sub = line.substring(r.nextInt(line.length()));
+  fileWriter.write(sub + "\n");
+ }
+    for (int i = 0; i < 3000; i++) {
+        int lineNum = r.nextInt(lines.size());
+        String line = lines.get(lineNum);
+String sub = line.substring(r.nextInt(line.length()));
+        if (sub.length() > 10) {
+            sub = sub.substring(0, 10);
+        }
+        fileWriter.write(sub + "\n");
+    }
+    for (int i = 0; i < 3000; i++) {
+    int length = r.nextInt(10) + 1;
+    fileWriter.write(generateRandomString(length) + "\n");
+    }
+    for (int i = 0; i < 1000; i++) {
+        fileWriter.write(UUID.randomUUID() + "\n");
+    }
+
+    fileWriter.close();
+
+}
+\end{lstlisting}
+
+简单来说，生成6000个原文中就有的字符串（随机截取），随机产生3000个长度
+不超过11的字符串，随机产生1000个长的随字符串（也就是UUID）
+
+
+
+
+\section{实验结果和分析}
+
+\subsection{实验设置}
+分别使用BruteForceSearch、KMPSearch、IndexedSearch
+执行程序生成的查询字符串（上文已说明如何产生），对
+同一个查询字符串文件，分别测试三种程序完成所有查询消耗的时间，并进行
+比较。
+
+\subsection{实验结果}
+
+下面的表格给出三个实验的耗时
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        实验编号          & 时间（ms） \\ \hline
+        BruteForce Search & 8066       \\ \hline
+        KMP Search        & 6631       \\ \hline
+        Indexed Search    & 4133       \\ \hline
+    \end{tabular}
+\end{table}
+\subsection{结果分析}
+
+可以看到，从搜索效率上来看有:
+
+\begin{equation}
+    \nonumber
+    IndexedSearch > KMPSearch > BruteForce Search
+\end{equation}
+
+但也要关注到，IndexedSearch建立索引的时间较长，如果只是数量有限
+的查询，应该优先使用\textit{KMP}算法进行搜索。
+
+
+\section{收获}
+本次实验通过实现三种文本搜索并进行性能评估，深入了解了它们
+之间的性能差距，并了解到它们适用的使用场景。
+
+\end{document}
