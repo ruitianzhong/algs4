@@ -20,10 +20,10 @@ public class TextIndexTest {
             System.out.println();
         }
 
-        String content2 = ReadFile.readCorpus();
+        String content2 = ReadFile.readCorpus("tale.txt");
         var queries = ReadFile.readQuery();
-       
-        kmp = new KMPSearch(content2); 
+
+        kmp = new KMPSearch(content2);
         testHelper("kmp", kmp, queries);
         kmp = null;
         bruteForce = new BruteForceSearch(content2);
@@ -39,7 +39,7 @@ public class TextIndexTest {
         long start = System.currentTimeMillis(), end;
         for (Query query : queries) {
             query.positon = ts.search(query.pattern);
-            
+
         }
         end = System.currentTimeMillis();
         System.out.println(testName + " total time:" + (end - start) + "ms");

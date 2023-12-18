@@ -192,9 +192,9 @@ String sub = line.substring(r.nextInt(line.length()));
     \begin{tabular}{|l|l|}
         \hline
         实验编号          & 时间（ms） \\ \hline
-        BruteForce Search & 8066       \\ \hline
-        KMP Search        & 6631       \\ \hline
-        Indexed Search    & 4133       \\ \hline
+        BruteForce Search & 7654       \\ \hline
+        KMP Search        & 6351       \\ \hline
+        Indexed Search    & 25         \\ \hline
     \end{tabular}
 \end{table}
 \subsection{结果分析}
@@ -206,12 +206,18 @@ String sub = line.substring(r.nextInt(line.length()));
     IndexedSearch > KMPSearch > BruteForce Search
 \end{equation}
 
-但也要关注到，IndexedSearch建立索引的时间较长，如果只是数量有限
+但也要关注到，IndexedSearch建立索引的需要时间，如果只是数量有限
 的查询，应该优先使用\textit{KMP}算法进行搜索。
 
 
 \section{收获}
 本次实验通过实现三种文本搜索并进行性能评估，深入了解了它们
 之间的性能差距，并了解到它们适用的使用场景。
+
+在这次实验实现文本索引的过程当中，在建立索引的时候使用了substring这个函数，但这个函数成为了建立索引和搜索的时候的性能瓶颈，因为在Java当中每次
+调用substring函数都会将substring对应的字符串复制一遍，造成极大的性能开销，具体来说，
+在取消substring调用之前，建立索引需要16000+ms，取消后只需要45ms，优化前搜索
+需要2000+ms，优化后完成所有搜索只需要25ms，这启示我在理解算法的同时，
+也要关注实现的细节。
 
 \end{document}

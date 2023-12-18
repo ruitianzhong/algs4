@@ -11,8 +11,7 @@ import java.util.UUID;
 
 public class ReadFile {
 
-    public static String readCorpus() throws IOException {
-        var filename = "tale.txt";
+    public static String readCorpus(String filename) throws IOException {
         File file = new File(filename);
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader reader = new BufferedReader(new FileReader(file));

@@ -10,7 +10,6 @@ public class IndexedSearch implements TextSearch {
         int l = 0, r = arr_length - 1;
         boolean found = false;
         int mid = 0;
-        int length = pattern.length();
         while (l <= r) {
             mid = l + (r - l) / 2;
             int ret = comparePattern(pattern, suffix_array[mid].index);
@@ -26,9 +25,7 @@ public class IndexedSearch implements TextSearch {
         }
         if (found) {
             for (int i = mid + 1; i < arr_length; i++) {
-                String s = this.content.substring(suffix_array[i].index);
-                int ret = s.substring(0, length > s.length() ? s.length() : length).compareTo(pattern);
-                ret = comparePattern(pattern, suffix_array[i].index);
+                int ret = comparePattern(pattern, suffix_array[i].index);
                 if (ret == 0) {
                     mid = i;
                     // find the first occurence
